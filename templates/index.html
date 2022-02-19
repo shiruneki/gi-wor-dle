@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com"> <!--TODO change fonts-->
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Telex" rel="stylesheet">
     <script src="{{url_for('static', filename='scripts.js')}}"></script>
@@ -10,15 +10,15 @@
 </head>     
 <body>
 
-<h2>Squirdle</h2>
-<h3>A Pokémon Wordle-like by <a href="https://www.fireblend.com">Fireblend</a></h3>
-I'm thinking of a Pokémon. Guess which! You have {{attempts}} guesses. <div class="tooltip">Emoji Key<span class="tooltiptext">🟩: Correct guess<br>🟥: Incorrect Guess<br>🟨: Type in wrong position<br>🔼: Guessed too low<br>🔽: Guessed too high</span></div>
-
+<h2>(G)I-(wor)DLE</h2>
+<h3>A Wordle-like daily game by <a href="https://github.com/shiruneki">Shiru</a>, based on <a href="https://squirdle.fireblend.com/daily">Squirdle</a></h3>
+Guess today's (G)I-DLE song! You have {{attempts}} guesses left today. <div class="tooltip">Emoji Key<span class="tooltiptext">🟩: Correct guess<br>🟥: Incorrect guess<br>🔼: Guessed too low<br>🔽: Guessed too high</span></div>
+<br>(Updates @ 00:00 GMT-10)
 <br><br>
 {% if data|length > 0 %}
 <div class="guesses">
     <div class="row">
-        {% for hint in ["Gen", "Type 1", "Type 2", "Height", "Weight", "Guess"] %}
+        {% for hint in ["Name", "Album", "Year", "Song length"] %}
         <div class='column'>
             <p class="hint">{{hint}}</p>
         </div>
@@ -27,11 +27,11 @@ I'm thinking of a Pokémon. Guess which! You have {{attempts}} guesses. <div cla
     
     {% for x in data %}
         <div class="row">
-        {% for hint in ["Gen", "Type 1", "Type 2", "Height", "Weight", "Guess"] %}
+        {% for hint in ["Name", "Album", "Year", "Song length"] %}
               <div class='column'>
               {% if hint == "Guess" %}
               <div class="tooltip"><p class=guess>{{x[hint]}}</p>
-                <span class="tooltiptext">{{x["pokeinfo"] | safe}}</span>
+                <span class="tooltiptext">{{x["songinfo"] | safe}}</span>
               </div>
               {% else %}
                 <p class=emoji>{{x[hint]}}</p>
@@ -46,16 +46,15 @@ I'm thinking of a Pokémon. Guess which! You have {{attempts}} guesses. <div cla
 
 {% if gameOver == 0 %}
 {% if error %}
-Pokemon not found!
+Song not found!
 {% endif %}
 <form autocomplete="off" method="POST">
-  <div class="autocomplete">
-    <input id="guess" type="text" name="guess" placeholder="Pokemon Name">
+  <div class="autocomplete" style="width:300px;">
+    <input id="guess" type="text" name="guess" placeholder="Song Name">
   </div>
   <input type="submit" value="Submit">
-</form><br>
+</form>
 {% endif %}
-
 {% if gameOver == 1 %}
 You won!
 {% endif %}
@@ -63,21 +62,15 @@ You won!
 You lost!
 {% endif %}
 {% if gameOver > 0 %}
-The secret Pokémon was <b>{{secret}}</b>!<br>
-<a class="togglec" onclick="copyCurrentDay('{{mosaic|safe}}')" href="#">📄 Share Result</a>
+Today's song was <b>{{secret}}</b>!<br>
+<a class="togglec" onclick="copyCurrentDay('{{mosaic|safe}}')" href="#">📄 Share Result</a><br>
+<br>
+Come back tomorrow for another daily!
 {% endif %}
 
-<form action="{{ url_for('index', clear=True) }}" method="GET">
-  <input type="hidden" name="clear" value="1" /> 
-  <button class="togglec" type="submit" name="gen" value="8">▶️ New Game</button>
-  <button class="togglec" type="submit" name="gen" value="1">▶️ New Game (Gen 1 only!)</button>
-</form>
-<br><a href="https://squirdle.fireblend.com/daily">Try Daily Squirdle!</a>
-
 <script>
-
-var pokemon = {{pokemon | safe}};
-autocomplete(document.getElementById("guess"), pokemon);
+var gsong = {{gsong | safe}};
+autocomplete(document.getElementById("guess"), gsong);
 </script>
 
 </body>
