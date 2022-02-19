@@ -1,27 +1,26 @@
 import numpy as np
 from datetime import datetime, timedelta
 
-def readPokedex():
+def readGidle():
     dex = np.recfromcsv("gidle.csv", encoding="utf-8")
     return dex
 
 def getSong():
     today = str(datetime.date(datetime.now()-timedelta(hours=10)))
-    dex = np.recfromcsv("gidle.csv", encoding="utf-8")
+    dex = np.recfromcsv("daily.csv", encoding="utf-8")
     row = dex[dex['date'] == today]
     secret = row['gsong'][0]
-    secret = np.random.choice(dex, 1)['name'][0]
     return secret
 
 def getSongList():
-    return list(readPokedex().name)
+    return list(readGidle().name)
 
 def getDay(pkmn):
-    dex = np.recfromcsv("gidle.csv", encoding="utf-8")
-    return list(dex['name']).index(pkmn)
+    dex = np.recfromcsv("daily.csv", encoding="utf-8")
+    return list(dex['gsong']).index(pkmn)
     
 def getSongInfo(gsong):
-    dex = readPokedex()
+    dex = readGidle()
     return dex[dex['name']==gsong][0]
 
 def getHint(guess_str, secret_str):
@@ -29,13 +28,11 @@ def getHint(guess_str, secret_str):
         guess = getSongInfo(guess_str)
         secret = getSongInfo(secret_str)
         hint = dict()
-        
+        hint['Name'] = '🟩' if guess["album"] == secret["album"] else '🟥'
         hint['Album'] = '🟩' if guess["album"] == secret["album"] else '🟥'
-
         hint['Release year'] = '🟩' if guess["year"] == secret["year"] else '🔼' if guess["year"] < secret["year"] else '🔽'
         hint['Song length'] = '🟩' if guess["song_length"] == secret["song_length"] else '🔼' if guess["song_length"] < secret["song_length"] else '🔽'
         hint['emoji'] = getHintMoji(hint)
-        hint['Album'] = '🟩' if guess["album"] == secret["album"] else '🔼' if guess["album"] < secret["album"] else '🔽'
         hint['name'] = 1 if guess_str == secret_str else 5
         hint['Guess'] = guess_str
         hint['songinfo'] = formatInfo(guess)

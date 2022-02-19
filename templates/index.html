@@ -18,7 +18,7 @@ Guess today's (G)I-DLE song! You have {{attempts}} guesses left today. <div clas
 {% if data|length > 0 %}
 <div class="guesses">
     <div class="row">
-        {% for hint in ["Name", "Album", "Year", "Song length"] %}
+        {% for hint in ["Name", "Album", "Release year", "Song length", "Guess"] %}
         <div class='column'>
             <p class="hint">{{hint}}</p>
         </div>
@@ -27,7 +27,7 @@ Guess today's (G)I-DLE song! You have {{attempts}} guesses left today. <div clas
     
     {% for x in data %}
         <div class="row">
-        {% for hint in ["Name", "Album", "Year", "Song length"] %}
+        {% for hint in ["Name", "Album", "Release year", "Song length", "Guess"] %}
               <div class='column'>
               {% if hint == "Guess" %}
               <div class="tooltip"><p class=guess>{{x[hint]}}</p>
