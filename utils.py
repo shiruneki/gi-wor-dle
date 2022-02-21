@@ -5,19 +5,25 @@ def readGidle():
     dex = np.recfromcsv("gidle.csv", encoding="utf-8")
     return dex
 
-def getSong():
+def getTodayRow(): ##
     today = str(datetime.date(datetime.now()-timedelta(hours=10)))
     dex = np.recfromcsv("daily.csv", encoding="utf-8")
     row = dex[dex['date'] == today]
-    secret = row['gsong'][0]
+    return row
+
+def getSpoti(): ##
+    return getTodayRow()['spoti'][0]
+
+def getSong(): ##
+    secret = getTodayRow()['gsong'][0]
     return secret
 
 def getSongList():
     return list(readGidle().name)
 
-def getDay(pkmn):
+def getDay(daily):
     dex = np.recfromcsv("daily.csv", encoding="utf-8")
-    return list(dex['gsong']).index(pkmn)
+    return list(dex['gsong']).index(daily)
     
 def getSongInfo(gsong):
     dex = readGidle()
@@ -28,7 +34,7 @@ def getHint(guess_str, secret_str):
         guess = getSongInfo(guess_str)
         secret = getSongInfo(secret_str)
         hint = dict()
-        hint['Name'] = '🟩' if guess["album"] == secret["album"] else '🟥'
+        hint['Name'] = '🟩' if guess["name"] == secret["name"] else '🟥'
         hint['Album'] = '🟩' if guess["album"] == secret["album"] else '🟥'
         hint['Release year'] = '🟩' if guess["year"] == secret["year"] else '🔼' if guess["year"] < secret["year"] else '🔽'
         hint['Song length'] = '🟩' if guess["song_length"] == secret["song_length"] else '🔼' if guess["song_length"] < secret["song_length"] else '🔽'

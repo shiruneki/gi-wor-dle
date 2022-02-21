@@ -10,12 +10,12 @@ app = Flask(__name__)
 GIWORDLE_KEY = os.environ['GIWORDLE_KEY']
 # API_STATS_URL = os.environ['API_STATS_URL']
 
-def getCookieData():
-    prefix = ""
+def getCookieData(): # The cookies are set with index() ##
     try:
-        secret = request.cookies.get(prefix+'secret')
-        attempts = int(request.cookies.get(prefix+'attempts'))
-        previousGuesses = request.cookies.get(prefix+'game_record')
+        secret = request.cookies.get('secret')
+        spoti = request.cookies.get('spoti') ##
+        attempts = int(request.cookies.get('attempts'))
+        previousGuesses = request.cookies.get('game_record')
         previousGuesses = json.loads(previousGuesses)
         gameOver = 1 if len(previousGuesses) > 0 and previousGuesses[-1]["name"] == 1 else 2 if attempts <= 0 else 0
     except:
@@ -23,7 +23,7 @@ def getCookieData():
         gameOver = 0
         attempts = 5
 
-    return previousGuesses, gameOver, secret, attempts
+    return previousGuesses, gameOver, secret, attempts, spoti ##
 
 def handleGameOver(previousGuesses, gameOver, secret, attempts, daily):
     # Stat collecting: Sends guesses, secret pokemon, remaining attempts and whether it's a daily attempt to stats endpoint.
@@ -39,16 +39,17 @@ def index():
         resp.set_cookie('game_record', "[]", expires=expire_date)
         resp.set_cookie('secret', getSong(), expires=expire_date)
         resp.set_cookie('attempts', '5', expires=expire_date)
+        resp.set_cookie('spoti', getSpoti(), expires=expire_date) ##
         resp.set_cookie('total_attempts', '5', expires=expire_date)
         return resp
 
-    previousGuesses, gameOver, secret, attempts = getCookieData()
+    previousGuesses, gameOver, secret, attempts, spoti = getCookieData() ##
     mosaic = "\n".join([x['emoji'] for x in previousGuesses])
-    return render_template("index.html", data=previousGuesses, gameOver=gameOver, gsong=getSongList(), secret=secret, error=False, mosaic=mosaic, attempts=attempts)
+    return render_template("index.html", data=previousGuesses, gameOver=gameOver, gsong=getSongList(), secret=secret, error=False, mosaic=mosaic, attempts=attempts, spoti=spoti) ##
 
 @app.route("/", methods=['POST'])
 def guess():
-    previousGuesses, gameOver, secret, attempts = getCookieData()
+    previousGuesses, gameOver, secret, attempts, spoti = getCookieData() ##
 
     if(not gameOver):
         hint = getHint(request.form['guess'], secret)
@@ -57,7 +58,7 @@ def guess():
             attempts -= 1
         else:
             mosaic = "\n".join([x['emoji'] for x in previousGuesses])
-            return render_template('index.html', data=previousGuesses, gameOver=gameOver, gsong=getSongList(), secret=secret, error=True, mosaic=mosaic, attempts=attempts)
+            return render_template('index.html', data=previousGuesses, gameOver=gameOver, gsong=getSongList(), secret=secret, error=True, mosaic=mosaic, attempts=attempts, spoti=spoti)
 
         gameOver = 1 if previousGuesses[-1]["name"] == 1 else 2 if attempts <= 0 else 0
         if(gameOver):
@@ -66,8 +67,8 @@ def guess():
     total_attempts = request.cookies.get('total_attempts')
     guesses = len(previousGuesses) if gameOver == 1 else 'X'
     day = getDay(secret)
-    mosaic = f"(G)I-DLE song {day} - {guesses}/{total_attempts}\\n\\n" +"\\n".join([x['emoji'] for x in previousGuesses])
-    resp = make_response(render_template('index.html', data=previousGuesses, gameOver=gameOver, gsong=getSongList(), secret=secret, error=False, mosaic=mosaic, attempts=attempts))
+    mosaic = f"(G)I-DLE song {day} - {guesses}/{total_attempts}\\n\\n" +"\\n".join([x['emoji'] for x in previousGuesses])+"\\n\\nhttp://www.gi-wor-dle.top"
+    resp = make_response(render_template('index.html', data=previousGuesses, gameOver=gameOver, gsong=getSongList(), secret=secret, error=False, mosaic=mosaic, attempts=attempts, spoti=spoti))
     resp.set_cookie('game_record', json.dumps(previousGuesses))
     resp.set_cookie('attempts', str(attempts))
 
@@ -76,3 +77,4 @@ def guess():
 if __name__ == "__main__":
     from waitress import serve
     serve(app, host="0.0.0.0", port=80)
+#    app.run(debug=True, use_reloader=True)
